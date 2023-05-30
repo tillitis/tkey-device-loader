@@ -25,7 +25,7 @@ RM=/bin/rm
 
 
 .PHONY: all
-all: loader/app.bin
+all: loader/app.bin tkey-loader
 
 # Turn elf into bin for device
 %.bin: %.elf
@@ -37,9 +37,16 @@ loader/app.elf: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -L $(LIBDIR)/monocypher -lmonocypher -I $(LIBDIR) -o $@
 $(OBJS): $(INCLUDE)/tk1_mem.h #loader/app_proto.h
 
+# .PHONY to let go build handle deps and rebuilds
+.PHONY: 
+tkey-loader: loader/app.bin
+	cp -af loader/app.bin go-loader/loader.bin
+	go build -o tkey-loader ./go-loader
+
+
 .PHONY: clean
 clean:
-	$(RM) -f loader/app.bin loader/app.elf $(OBJS)
+	$(RM) -f tkey-loader loader/app.bin loader/app.elf $(OBJS)
 
 # Uses ../.clang-format
 FMTFILES=loader/*.[ch]

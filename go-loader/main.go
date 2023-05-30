@@ -5,6 +5,7 @@ package main
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"log"
 	"os"
@@ -16,11 +17,17 @@ import (
 	"github.com/tillitis/tkeyclient"
 )
 
+// nolint:typecheck // Avoid lint error when the embedding file is missing.
+// Makefile copies the built app here ./app.bin
+//
+//go:embed loader.bin
+var loaderBinary []byte
+
 // Use when printing err/diag msgs
 var le = log.New(os.Stderr, "", 0)
 
 func main() {
-	var fileName, fileName2, devPath string
+	var fileName, devPath string
 	var speed int
 	var verbose, helpOnly bool
 	pflag.CommandLine.SetOutput(os.Stderr)
@@ -46,13 +53,12 @@ running some app.`, os.Args[0])
 	pflag.Parse()
 
 	if pflag.NArg() > 0 {
-		if pflag.NArg() > 2 {
+		if pflag.NArg() > 1 {
 			le.Printf("Unexpected argument: %s\n\n", strings.Join(pflag.Args()[1:], " "))
 			pflag.Usage()
 			os.Exit(2)
 		}
 		fileName = pflag.Args()[0]
-		fileName2 = pflag.Args()[1]
 	}
 
 	if helpOnly {
@@ -61,12 +67,6 @@ running some app.`, os.Args[0])
 	}
 
 	if fileName == "" {
-		le.Printf("Please pass an app binary FILE.\n\n")
-		pflag.Usage()
-		os.Exit(2)
-	}
-
-	if fileName2 == "" {
 		le.Printf("Please pass an app binary FILE.\n\n")
 		pflag.Usage()
 		os.Exit(2)
@@ -82,16 +82,6 @@ running some app.`, os.Args[0])
 		os.Exit(1)
 	}
 	if bytes.HasPrefix(appBin, []byte("\x7fELF")) {
-		le.Printf("%s looks like an ELF executable, but a raw binary is expected.\n", fileName)
-		os.Exit(1)
-	}
-
-	appBin2, err := os.ReadFile(fileName2)
-	if err != nil {
-		le.Printf("Failed to read file: %v\n", err)
-		os.Exit(1)
-	}
-	if bytes.HasPrefix(appBin2, []byte("\x7fELF")) {
 		le.Printf("%s looks like an ELF executable, but a raw binary is expected.\n", fileName)
 		os.Exit(1)
 	}
@@ -137,15 +127,15 @@ running some app.`, os.Args[0])
 
 	le.Printf("Loading app from %v onto device\n", fileName)
 
-	err = tk.LoadApp(appBin, secret)
+	err = tk.LoadApp(loaderBinary, secret)
 	if err != nil {
 		le.Printf("LoadAppFromFile failed: %v\n", err)
 		exit(1)
 	}
 
-	le.Printf("Loading app from %v onto device\n", fileName2)
+	le.Printf("Loading app from %v onto device\n", fileName)
 
-	err = tk.LoadApp(appBin2, secret)
+	err = tk.LoadApp(appBin, secret)
 	if err != nil {
 		le.Printf("LoadAppFromFile failed: %v\n", err)
 		exit(1)
