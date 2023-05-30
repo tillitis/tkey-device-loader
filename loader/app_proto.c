@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2023 - Tillitis AB
+ * SPDX-License-Identifier: GPL-2.0-only
+ */
+
 #include <proto.h>
 
 #include "app_proto.h"
