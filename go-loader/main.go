@@ -33,7 +33,7 @@ func main() {
 	pflag.CommandLine.SetOutput(os.Stderr)
 	pflag.CommandLine.SortFlags = false
 	pflag.StringVar(&devPath, "port", "",
-		"Set serial port device `PATH`. If this is not passed, auto-detection will be attempted.")
+		"Set serial port device `PATH`.")
 	pflag.IntVar(&speed, "speed", tkeyclient.SerialSpeed,
 		"Set serial port speed in `BPS` (bits per second).")
 	pflag.BoolVar(&verbose, "verbose", false, "Enable verbose output.")
