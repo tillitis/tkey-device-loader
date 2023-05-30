@@ -30,3 +30,17 @@ appBin2, err := os.ReadFile(fileName2)
 err = tk.LoadApp(appBin, secret)
 err = tk.LoadApp(appBin2, secret)
 ```
+
+To build and run `go-loader`:
+
+```
+$ cd go-builder
+$ go build
+
+```
+
+To run, for example with the blink device app in `~/tillitis/git/tillitis-key1-apps/apps/blink/app.bin`:
+
+```
+$  ./go-loader --port /dev/ttyACM0 ../loader/app.bin ~/tillitis/git/tillitis-key1-apps/apps/blink/app.bin
+```
